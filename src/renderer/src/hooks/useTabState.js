@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { api } from '../lib/api'
 import { extractFrontMatter } from '../lib/front-matter'
 import { extractHeadings } from '../lib/toc-extractor'
 import { calculateStats } from '../lib/stats'
@@ -64,8 +65,8 @@ export function useTabState() {
       ...derived
     }
 
-    window.api?.setTitle(`${getFileName(data.filePath)} - Markdown Viewer`)
-    window.api?.watchFile?.(data.filePath)
+    api.setTitle(`${getFileName(data.filePath)} - Markdown Viewer`)
+    api.watchFile(data.filePath)
 
     setTabs(prev => [...prev, tab])
     setActiveTabId(tab.id)
@@ -77,7 +78,7 @@ export function useTabState() {
     if (idx === -1) return
 
     const closingTab = prev[idx]
-    window.api?.unwatchFile?.(closingTab.filePath)
+    api.unwatchFile(closingTab.filePath)
     delete scrollPositions.current[tabId]
 
     const next = prev.filter(t => t.id !== tabId)
@@ -86,11 +87,11 @@ export function useTabState() {
     setActiveTabId(currentActive => {
       if (currentActive !== tabId) return currentActive
       if (next.length === 0) {
-        window.api?.setTitle('Markdown Viewer')
+        api.setTitle('Markdown Viewer')
         return null
       }
       const newActive = next[Math.min(idx, next.length - 1)]
-      window.api?.setTitle(`${getFileName(newActive.filePath)} - Markdown Viewer`)
+      api.setTitle(`${getFileName(newActive.filePath)} - Markdown Viewer`)
       return newActive.id
     })
   }, [])
@@ -102,7 +103,7 @@ export function useTabState() {
     const tab = tabsRef.current.find(t => t.id === tabId)
     if (tab) {
       const dirty = tab.content !== tab.savedContent ? ' *' : ''
-      window.api?.setTitle(`${getFileName(tab.filePath)}${dirty} - Markdown Viewer`)
+      api.setTitle(`${getFileName(tab.filePath)}${dirty} - Markdown Viewer`)
     }
     restoreScrollPosition(tabId)
   }, [saveScrollPosition, restoreScrollPosition])
@@ -116,13 +117,12 @@ export function useTabState() {
   }, [activeTabId])
 
   const openFile = useCallback(async (filePathOrEvent) => {
-    if (!window.api) return
     try {
       let data
       if (typeof filePathOrEvent === 'string') {
-        data = await window.api.readFile(filePathOrEvent)
+        data = await api.readFile(filePathOrEvent)
       } else {
-        data = await window.api.openFileDialog()
+        data = await api.openFileDialog()
       }
       if (data) addTab(data)
     } catch (err) {
@@ -131,30 +131,28 @@ export function useTabState() {
   }, [addTab])
 
   const saveFile = useCallback(async () => {
-    if (!activeTab || !window.api?.saveFile) return
+    if (!activeTab) return
     if (activeTab.content === activeTab.savedContent) return
     try {
-      await window.api.saveFile(activeTab.filePath, activeTab.content)
+      await api.saveFile(activeTab.filePath, activeTab.content)
       setTabs(prev => prev.map(t => {
         if (t.id !== activeTabId) return t
         return { ...t, savedContent: t.content }
       }))
-      window.api?.setTitle(`${getFileName(activeTab.filePath)} - Markdown Viewer`)
+      api.setTitle(`${getFileName(activeTab.filePath)} - Markdown Viewer`)
     } catch (err) {
       console.error('Failed to save file:', err)
     }
   }, [activeTab, activeTabId])
 
-  // Listen for file opened from main process (CLI, second instance)
+  // Listen for file opened from CLI or second instance
   useEffect(() => {
-    if (!window.api?.onFileOpened) return
-    return window.api.onFileOpened((data) => addTab(data))
+    return api.onFileOpened((data) => addTab(data))
   }, [addTab])
 
   // Listen for external file changes
   useEffect(() => {
-    if (!window.api?.onFileChanged) return
-    return window.api.onFileChanged((data) => {
+    return api.onFileChanged((data) => {
       setTabs(prev => prev.map(t => {
         if (t.filePath !== data.filePath) return t
         // Don't overwrite dirty tabs

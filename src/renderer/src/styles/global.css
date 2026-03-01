@@ -866,3 +866,51 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
+
+/* ─── Print Styles (PDF export via Ctrl+P) ─────────────── */
+@media print {
+  @page {
+    margin: 0;
+  }
+
+  .tab-bar,
+  .toolbar,
+  .statusbar,
+  .search-bar,
+  .toc-sidebar,
+  .drop-zone-overlay,
+  .editor-pane,
+  .split-handle,
+  .front-matter-banner {
+    display: none !important;
+  }
+
+  html, body, #root {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .app-container {
+    display: block;
+    height: auto !important;
+  }
+
+  .main-content {
+    display: block;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .content-pane {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  .markdown-preview {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 1.5cm;
+  }
+}

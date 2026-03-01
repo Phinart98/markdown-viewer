@@ -11,6 +11,7 @@ export function useMarkdownPipeline() {
       setReady(true)
     }).catch(err => {
       console.error('Markdown pipeline initialization failed:', err)
+      mdRef.current = createMarkdownRenderer()
       setReady(true)
     })
   }, [])

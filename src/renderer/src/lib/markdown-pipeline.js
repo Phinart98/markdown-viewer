@@ -1,3 +1,4 @@
+import { convertFileSrc } from '@tauri-apps/api/core'
 import MarkdownIt from 'markdown-it'
 import taskLists from 'markdown-it-task-lists'
 import footnote from 'markdown-it-footnote'
@@ -69,7 +70,7 @@ export function createMarkdownRenderer() {
       const resolvedBase = env.basePath
       if (resolvedBase) {
         const absolutePath = resolvedBase.replace(/\\/g, '/') + '/' + src
-        token.attrSet('src', 'file:///' + absolutePath)
+        token.attrSet('src', convertFileSrc(absolutePath))
       }
     }
     return defaultImageRender(tokens, idx, options, env, self)

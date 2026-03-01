@@ -1,6 +1,7 @@
 import { useMemo, useRef, useEffect } from 'react'
 import DOMPurify from 'dompurify'
 import { useMarkdownPipeline } from '../hooks/useMarkdownPipeline'
+import { api } from '../lib/api'
 
 const purify = DOMPurify(window)
 purify.addHook('uponSanitizeAttribute', (node, data) => {
@@ -88,7 +89,7 @@ export default function MarkdownPreview({ content, filePath, searchQuery, active
       const href = anchor.getAttribute('href')
       if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
         e.preventDefault()
-        window.api?.openExternal?.(href)
+        api.openExternal(href)
       }
     }
 

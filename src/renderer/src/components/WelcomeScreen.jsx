@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
+import { api } from '../lib/api'
 
 export default function WelcomeScreen({ onOpen }) {
   const [recentFiles, setRecentFiles] = useState([])
 
   useEffect(() => {
-    window.api?.getRecentFiles?.().then(files => setRecentFiles(files || []))
+    api.getRecentFiles().then(files => setRecentFiles(files || []))
   }, [])
 
   return (
