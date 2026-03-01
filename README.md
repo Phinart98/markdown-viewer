@@ -22,28 +22,28 @@ A lightweight desktop Markdown viewer with GitHub-style rendering, syntax highli
 
 ## Getting Started
 
+Requires [Rust](https://rustup.rs/) and Node.js.
+
 ```bash
 npm install
-npm run dev
+npm run tauri:dev
 ```
 
 ## Build & Package
 
 ```bash
-# Build for production
-npm run build
-
-# Package as a Windows installer
-npm run package
+# Package as a Windows installer (~5 MB)
+npm run tauri:build
 ```
+
+The installer is written to `src-tauri/target/release/bundle/nsis/`.
 
 ## Tech Stack
 
-- [Electron](https://www.electronjs.org/) — desktop runtime
+- [Tauri 2](https://tauri.app/) — desktop runtime (Rust + system WebView)
 - [React](https://react.dev/) — UI framework
-- [Vite](https://vite.dev/) via [electron-vite](https://electron-vite.org/) — build tooling
+- [Vite](https://vite.dev/) — build tooling
 - [markdown-it](https://github.com/markdown-it/markdown-it) — Markdown parser
 - [Shiki](https://shiki.style/) — syntax highlighting
 - [KaTeX](https://katex.org/) — math rendering
 - [DOMPurify](https://github.com/cure53/DOMPurify) — HTML sanitization
-- [Chokidar](https://github.com/paulmillr/chokidar) — file watching
